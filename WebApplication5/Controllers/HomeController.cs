@@ -1,22 +1,30 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using WebApplication5.Data;
 using WebApplication5.Models;
+using WebApplication5.ViewModels;
 
 namespace WebApplication5.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            var products = await _context.Products.ToListAsync();
+            var model = new HomeViewModel { Products = products };
+            return View(model);
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+
 
         public IActionResult Privacy()
         {
