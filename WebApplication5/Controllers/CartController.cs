@@ -27,9 +27,17 @@ namespace WebApplication5.Controllers
                 .Include(x => x.Product)
                 .Where(x => x.UserId == currentuser.Id)
                 .ToListAsync();
+            double totalCost = 0;
 
+            foreach (var cartItem in cart)
+            {
+                totalCost += cartItem.Product.price * cartItem.QTY;
+            }
+
+            ViewBag.TotalCost = totalCost;
 
             return View(cart);
+
         
         }
         public async Task<IActionResult> UpdateQty(int productId, int qty)
