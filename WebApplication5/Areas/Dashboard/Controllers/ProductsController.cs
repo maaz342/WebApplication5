@@ -23,7 +23,8 @@ namespace WebApplication5.Areas.Dashboard.Controllers
         // GET: Dashboard/Products
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Products.ToListAsync());
+            return View(await _context.Products.Include(x=>x.category)
+                .ToListAsync());
         }
 
         // GET: Dashboard/Products/Details/5
@@ -61,10 +62,10 @@ namespace WebApplication5.Areas.Dashboard.Controllers
             {
                 ModelState.AddModelError(nameof(Product.image), "Image is required.");
             }
-            var imageFileName = Guid.NewGuid()+Path.GetExtension(Image.FileName);
+            var imageFileName = Guid.NewGuid() + Path.GetExtension(Image.FileName);
             if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img/Products")))
 
-                {
+            {
                 Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img/Products"));
 
             }
@@ -74,7 +75,7 @@ namespace WebApplication5.Areas.Dashboard.Controllers
             {
                 await Image.CopyToAsync(stream);
             }
-            product.image = $"/img/Products/{ imageFileName}";
+            product.image = $"/img/Products/{imageFileName}";
             if (ModelState.IsValid)
             {
                 _context.Add(product);
@@ -97,6 +98,8 @@ namespace WebApplication5.Areas.Dashboard.Controllers
             {
                 return NotFound();
             }
+            var categories = await _context.categories.ToArrayAsync();
+            ViewBag.categories = new SelectList(categories,"Id","Name");
             return View(product);
         }
 
@@ -105,9 +108,9 @@ namespace WebApplication5.Areas.Dashboard.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product product,IFormFile Image)
+        public async Task<IActionResult> Edit(int id, Product product, IFormFile Image)
         {
-        
+
             if (id != product.id)
             {
                 return NotFound();
@@ -118,7 +121,7 @@ namespace WebApplication5.Areas.Dashboard.Controllers
 
                 try
                 {
-                    var oldproduct=await _context.Products.FirstOrDefaultAsync(x=>x.id==id);
+                    var oldproduct = await _context.Products.FirstOrDefaultAsync(x => x.id == id);
                     if (Image != null)
                     {
 
@@ -136,11 +139,12 @@ namespace WebApplication5.Areas.Dashboard.Controllers
                             await Image.CopyToAsync(stream);
                         }
                         oldproduct.image = $"/img/Products/{imageFileName}";
-                       
+
                     }
                     oldproduct.name = product.name;
                     oldproduct.description = product.description;
                     oldproduct.price = product.price;
+                    oldproduct.categoryid = product.categoryid;
 
                     _context.Update(oldproduct);
                     await _context.SaveChangesAsync();

@@ -286,6 +286,29 @@ namespace WebApplication5.Data.Migrations
                     b.ToTable("Carts");
                 });
 
+            modelBuilder.Entity("WebApplication5.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("categories");
+                });
+
             modelBuilder.Entity("WebApplication5.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -355,6 +378,9 @@ namespace WebApplication5.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
+                    b.Property<int?>("categoryid")
+                        .HasColumnType("int");
+
                     b.Property<string>("description")
                         .HasColumnType("nvarchar(max)");
 
@@ -362,12 +388,15 @@ namespace WebApplication5.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("price")
                         .HasColumnType("float");
 
                     b.HasKey("id");
+
+                    b.HasIndex("categoryid");
 
                     b.ToTable("Products");
                 });
@@ -483,6 +512,15 @@ namespace WebApplication5.Data.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("WebApplication5.Models.Product", b =>
+                {
+                    b.HasOne("WebApplication5.Models.Category", "category")
+                        .WithMany()
+                        .HasForeignKey("categoryid");
+
+                    b.Navigation("category");
                 });
 
             modelBuilder.Entity("WebApplication5.Models.Order", b =>
