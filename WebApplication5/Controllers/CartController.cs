@@ -11,8 +11,8 @@ namespace WebApplication5.Controllers
     public class CartController : Controller
     {
         public readonly ApplicationDbContext _context;
-        public readonly UserManager<IdentityUser> _userManager;
-        public CartController(ApplicationDbContext context,UserManager<IdentityUser> userManager)
+        public readonly UserManager<ApplicationUser> _userManager;
+        public CartController(ApplicationDbContext context,UserManager<ApplicationUser> userManager)
         {
             _context = context;
           _userManager = userManager;

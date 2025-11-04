@@ -10,9 +10,9 @@ namespace WebApplication5.Controllers
     public class CheckOutController : Controller
     {
         public readonly ApplicationDbContext _context;
-        public readonly UserManager<IdentityUser> _userManager; 
+        public readonly UserManager<ApplicationUser> _userManager; 
         
-        public CheckOutController(ApplicationDbContext applicationDbContext,UserManager<IdentityUser> userManager)
+        public CheckOutController(ApplicationDbContext applicationDbContext,UserManager<ApplicationUser> userManager)
         {
             _context = applicationDbContext;
             _userManager = userManager;
@@ -21,7 +21,7 @@ namespace WebApplication5.Controllers
         {
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);
 
-            var addresses = await _context.addresses
+            var addresses = await _context.Addresses
                 .Include(x => x.User)
                 .Where(x => x.UserId == currentuser.Id)
                 .ToListAsync();
@@ -30,15 +30,15 @@ namespace WebApplication5.Controllers
 
             return View();
         }
-        public async Task <IActionResult> Confirm(int addressid)
+        public async Task<IActionResult> Confirm(int addressid)
         {
-            var address = await _context.addresses.Where(x => x.Id == addressid).FirstOrDefaultAsync();
+            var address = await _context.Addresses.Where(x => x.Id == addressid).FirstOrDefaultAsync();
             if (address == null)
             {
                 return BadRequest();
             }
-            var currentuser=await _userManager.GetUserAsync(HttpContext.User);
-               double orderCost = 0;
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+            double orderCost = 0;
 
             var carts = await _context.Carts
                 .Include(x => x.Product)
@@ -57,28 +57,38 @@ namespace WebApplication5.Controllers
                 Amount = orderCost,
 
             };
-            _context.orders.Add(order);
+            _context.Orders.Add(order);
             await _context.SaveChangesAsync();
-            foreach( var cart in carts)
+            foreach (var cart in carts)
             {
                 var orderProduct = new OrderProduct
                 {
                     ProductId = cart.ProductId,
                     OrderId = order.Id,
+                    Price = cart.Product.price,
+                    Qty = cart.QTY,
                 };
                 _context.Add(orderProduct);
+
             }
-            return RedirectToAction("Index");
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ThankYou");
+        }
+
+        public IActionResult ThankYou()
+        {
+            return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(Address address)
+            public async Task<IActionResult> Index(Address address)
         {
             if (ModelState.IsValid)
             {
                 var currentuser = await _userManager.GetUserAsync(HttpContext.User);
                 address.UserId = currentuser.Id;
-                _context.addresses.Add(address);
+                _context.Addresses.Add(address);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("ThankYou");
             }

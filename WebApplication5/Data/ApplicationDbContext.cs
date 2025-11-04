@@ -4,7 +4,7 @@ using WebApplication5.Models;
 
 namespace WebApplication5.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -12,8 +12,8 @@ namespace WebApplication5.Data
         }
         public DbSet<Product> Products { get; set; }
         public DbSet<Cart> Carts { get; set; }
-        public DbSet<Address> addresses { get; set; }
-        public DbSet<Order> orders { get; set; }
-        public DbSet<OrderProduct> orderProducts { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderProduct> OrderProducts { get; set; }
             }
 }

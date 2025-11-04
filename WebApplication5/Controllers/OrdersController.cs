@@ -16,7 +16,7 @@ namespace WebApplication5.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var orders = await _context.orders
+            var orders = await _context.Orders
                 .Include(x => x.OrderProducts)
                 .ToListAsync();
 
@@ -25,7 +25,7 @@ namespace WebApplication5.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            var order = await _context.orders
+            var order = await _context.Orders
                 .Include(x => x.OrderProducts)
                 .ThenInclude(x => x.Product)
                 .Include(x => x.Address)
